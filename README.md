@@ -15,8 +15,13 @@ speech leg changes.
 
 ## Vendors
 
-Pick a vendor with `TTS_VENDOR`; supply the required env vars; optionally override
-the voice with `TTS_VOICE` or the model with `TTS_MODEL`.
+Two ways to pick a vendor:
+- **In the UI** — the pre-call screen has a **TTS vendor dropdown**; choose one and
+  start. No restart needed. (A "needs key" vendor still requires its env vars set on
+  the server; if they're missing, startup reports exactly which.)
+- **By env** — set `TTS_VENDOR` (the default for the dropdown) + the vendor's key in
+  `server/.env.local`; optionally override the voice with `TTS_VOICE` or the model
+  with `TTS_MODEL`.
 
 | Vendor | `TTS_VENDOR` | Required env | Default voice/model |
 | --- | --- | --- | --- |
@@ -36,6 +41,33 @@ the voice with `TTS_VOICE` or the model with `TTS_MODEL`.
 
 🟢 = keyless. The selected vendor's credentials are validated **when the agent
 starts** (not at construction), so `/get_config` always works key-less.
+
+### Sample code — how each vendor is wired
+
+Every vendor is a small, copy-pasteable builder in [`server/src/vendors.py`](server/src/vendors.py)
+that shows the real SDK constructor. For example:
+
+```python
+from agora_agent.agentkit import vendors as V
+
+# MiniMax — Agora-managed, key-less:
+V.MiniMaxTTS(model="speech_2_6_turbo", voice_id="English_captivating_female1")
+
+# OpenAI — Agora-managed, key-less:
+V.OpenAITTS(voice="alloy")
+
+# ElevenLabs — set ELEVENLABS_API_KEY:
+V.ElevenLabsTTS(
+    key=env["ELEVENLABS_API_KEY"],
+    model_id="eleven_turbo_v2_5",
+    voice_id="21m00Tcm4TlvDq8ikWAM",
+    base_url="https://api.elevenlabs.io",
+)
+```
+
+The agent attaches the chosen one with `.with_tts(build_vendor(name))`; STT
+(`DeepgramSTT`) and LLM (`OpenAI`) stay on their key-less configs. To add or
+change a vendor, edit its `build_<vendor>` function + the `REGISTRY` line.
 
 ## Prerequisites
 
@@ -61,8 +93,9 @@ bun run dev
 Open [http://localhost:3000](http://localhost:3000) → **Start Conversation** → speak.
 Watch the **Event Timeline** panel update in real time.
 
-To try a different voice, set `TTS_VENDOR` and that vendor's key in `server/.env.local`
-(see [Vendors](#vendors)), then restart.
+To try a different voice, pick it from the **dropdown** on the pre-call screen (no
+restart). For a "needs key" vendor, set its key in `server/.env.local` first (see
+[Vendors](#vendors)).
 
 ### Working from a clone
 
@@ -136,14 +169,15 @@ Next.js  ──rewrite──▶  Agent backend  (server/, localhost:8000)
                        EventTimeline + annotated transcript in the web UI
 ```
 
-The TTS vendor switchboard lives in `server/src/vendors.py` — a data-driven
-registry mapping each vendor to `{cls, creds, defaults}`. See
-[ARCHITECTURE.md](./ARCHITECTURE.md).
+The TTS vendor switchboard lives in `server/src/vendors.py` — one readable
+`build_<vendor>` function per vendor (the sample code) plus a `REGISTRY` mapping
+name → builder + required env. See [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## What You Get
 
-- A **vendor switchboard** for the TTS leg: one `build_vendor()` over a `SPECS`
-  table covering all 13 A4.1 TTS vendors, selected via `TTS_VENDOR`.
+- A **vendor switchboard** for the TTS leg: one readable `build_<vendor>` function
+  per vendor (covering all 13 A4.1 TTS vendors), selected via `TTS_VENDOR` or the
+  in-UI dropdown.
 - A **Next.js** web client (:3000) with a live **EventTimeline** (state, metric,
   error, turn events; reverse-chronological, capped at 50) and an **annotated
   transcript** that shows the current agent state in the header.
@@ -173,7 +207,7 @@ registry mapping each vendor to `{cls, creds, defaults}`. See
 
 - `web/` — Next.js frontend (:3000); RTC/RTM lifecycle, EventTimeline, transcript.
 - `server/` — FastAPI agent backend (:8000); Agora tokens + agent lifecycle.
-- `server/src/vendors.py` — the data-driven TTS vendor registry.
+- `server/src/vendors.py` — one readable builder per TTS vendor + the registry.
 - `ARCHITECTURE.md` — system shape and component boundaries.
 - `AGENTS.md` — guide for coding agents working in this repo.
 
