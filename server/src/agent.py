@@ -89,6 +89,7 @@ class Agent:
         llm = OpenAI(model="gpt-4o-mini")
 
         parameters = {
+            "audio_scenario": "chorus",  # web client — ultra-low-latency chorus profile
             "data_channel": "rtm",
             "enable_error_message": True,
             "enable_metrics": True,
