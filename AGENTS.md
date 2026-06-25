@@ -4,6 +4,19 @@ For coding agents working in `recipe-agent-tts-vendors`. This repository is the
 **TTS vendors** recipe in the Agora Conversational AI recipes family: the TTS leg
 is a per-vendor switchboard (one readable `build_<vendor>` per vendor) selected via `TTS_VENDOR`.
 
+## How to Load
+
+This repository uses progressive disclosure documentation. Docs live under
+`docs/ai/` in three levels.
+
+1. Read [docs/ai/L0_repo_card.md](docs/ai/L0_repo_card.md) to identify the repo.
+2. This repo declares `Recipe Role: base`; read [docs/ai/RECIPE.md](docs/ai/RECIPE.md) before changing reusable recipe contracts.
+3. Load ALL 8 files in [docs/ai/L1/](docs/ai/L1/). They are small — load all upfront.
+4. Follow L2 deep-dive links only when L1 isn't detailed enough. The index is at [docs/ai/L1/L2/_index.md](docs/ai/L1/L2/_index.md).
+
+The sections below remain the canonical contributor handbook for hands-on work;
+the `docs/ai/` tree is the structured summary used by AI agents.
+
 ## System shape
 
 - **`server/`** — Python FastAPI agent backend (:8000). Owns Agora token
@@ -22,8 +35,8 @@ is a per-vendor switchboard (one readable `build_<vendor>` per vendor) selected 
 
 ## Vendor registry
 
-- `server/src/vendors.py` holds `CATEGORY = "TTS"`, the `SPECS` table (all 13
-  A4.1 TTS vendors), and `build_vendor()` / `required_env()` / `available()`.
+- `server/src/vendors.py` holds `CATEGORY = "TTS"`, the `REGISTRY` (all 13
+  A4.1 TTS vendors), and `build_vendor()` / `required_env()` / `available()` / `needs_key()`.
 - `agent.py` reads `TTS_VENDOR` in `__init__` (no validation) and calls
   `build_vendor(self.vendor)` for the TTS leg **in `start()`** — BYO credential
   validation happens there, so `/get_config` stays key-less.
@@ -74,7 +87,7 @@ The web client uses `AgoraVoiceAI` to subscribe and surfaces events as
 
 - Keep the web client calling `/api/*`; hide backend placement behind Next rewrites.
 - Keep token generation and the App Certificate in `server/`.
-- Add or change TTS vendors only in the `SPECS` table in `vendors.py`; the
+- Add or change TTS vendors only in `vendors.py` (`REGISTRY` + `build_<vendor>`); the
   framework (`build_vendor`/`required_env`/`available`) is shared across the
   sibling vendor recipes — keep it identical.
 - Validate vendor creds in `start()` via `build_vendor`, never in `__init__`.
@@ -90,7 +103,6 @@ The web client uses `AgoraVoiceAI` to subscribe and surfaces events as
   translator recipe.
 - Do not put `PORT` in `server/.env.example` (it would clobber the random port
   that `verify:local:fastapi` injects via `load_dotenv(override=True)`).
-- Do not link to `docs/ai/` — that progressive-disclosure tree is not present yet.
 
 ## Commands
 
@@ -104,7 +116,7 @@ bun run verify:local   # full local gate
 ```
 
 Narrower checks: `bun run verify:backend`, `bun run verify:local:fastapi`,
-`bun run verify:web:proxy`.
+`bun run verify:web:proxy`. Backend tests: `cd server && pytest tests -v`.
 
 ## Done criteria
 
@@ -114,12 +126,41 @@ Narrower checks: `bun run verify:backend`, `bun run verify:local:fastapi`,
    `verify:local:fastapi` / `verify:backend`) passes.
 4. If you change required env vars or setup steps, update the root README,
    the relevant module README, and `server/.env.example` together.
+5. If the change touches workflows, interfaces, gotchas, or security details,
+   update the matching file under [docs/ai/L1/](docs/ai/L1/) and bump
+   `Last Reviewed` in [docs/ai/L0_repo_card.md](docs/ai/L0_repo_card.md).
 
-## Git conventions
+## Git Conventions
 
-- Conventional Commits: `type: description` or `type(scope): description`
-  (`feat`, `fix`, `chore`, `test`, `docs`). Lowercase after the prefix, present
-  tense.
-- No AI tool names in commit messages or PR descriptions. No `Co-Authored-By`
-  trailers. No `--no-verify`. No git config changes.
-- Branch names: `type/short-description` (e.g. `feat/add-event-filter`).
+### Commit messages — conventional commits
+
+- **Format:** `type: description` or `type(scope): description`
+- **Types:** `feat:` (new feature), `fix:` (bug fix), `chore:` (maintenance, version bumps), `test:` (test additions/changes), `docs:` (documentation)
+- **Scoped variant:** `feat(scope):`, `fix(scope):` — e.g. `fix(server): validate vendor creds`
+- **Lowercase after prefix** — `feat: add feature`, not `feat: Add feature`
+- **Present tense** — "add feature", not "added feature"
+
+### Branch names
+
+- **Format:** `type/short-description` — lowercase, hyphen-separated
+- **Types match commit types:** `feat/`, `fix/`, `chore/`, `test/`, `docs/`
+- **Examples:** `feat/add-vendor-sarvam`, `fix/vendor-cred-validation`, `docs/progressive-disclosure`
+
+### General rules
+
+- **Repo-local `AGENTS.md` is the authoritative source for repo conventions.**
+- **No AI tool names** — never mention claude, cursor, copilot, cody, aider, gemini, codex, chatgpt, or gpt-3/4 in commit messages or PR descriptions.
+- **No Co-Authored-By trailers** — omit AI attribution lines.
+- **No `--no-verify`** — let git hooks run normally.
+- **No git config changes** — do not modify `user.name` or `user.email`.
+
+## Doc Commands
+
+| Command       | When to use                                                                  |
+| ------------- | ---------------------------------------------------------------------------- |
+| generate docs | No `docs/ai/` directory exists yet                                           |
+| update docs   | Code changed since the `Last Reviewed` date in L0                            |
+| test docs     | Verify docs give agents the right context (writes `docs/ai/test-results.md`) |
+| fix docs      | Close findings from a docs review or test run                                |
+
+See the [progressive disclosure standard](https://github.com/AgoraIO-Community/ai-devkit/blob/main/docs/standard/progressive-disclosure-standard.md) and [workflows](https://github.com/AgoraIO-Community/ai-devkit/blob/main/docs/workflows/progressive-disclosure-docs.md) for the full specification.
