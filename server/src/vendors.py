@@ -106,11 +106,17 @@ def build_humeai(env):
 
 
 def build_rime(env):
-    """Rime — set RIME_API_KEY (rime.ai)."""
+    """Rime — Agora-managed by default; set RIME_API_KEY for BYOK."""
+    if env.get("RIME_API_KEY"):
+        return V.RimeTTS(
+            key=env["RIME_API_KEY"],
+            speaker="cove",
+            model_id="mistv2",
+        )
     return V.RimeTTS(
-        key=env["RIME_API_KEY"],
-        speaker="cove",
-        model_id="mistv2",
+        credential_mode="managed",
+        base_url="wss://users-ws.rime.ai/ws3",
+        model_id="mistv3",
     )
 
 
@@ -149,7 +155,7 @@ REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
     "amazon":     (build_amazon,     ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_REGION"]),
     "microsoft":  (build_microsoft,  ["AZURE_SPEECH_KEY", "AZURE_SPEECH_REGION"]),
     "humeai":     (build_humeai,     ["HUME_API_KEY"]),
-    "rime":       (build_rime,       ["RIME_API_KEY"]),
+    "rime":       (build_rime,       []),  # RIME_API_KEY is optional (BYOK)
     "fishaudio":  (build_fishaudio,  ["FISH_API_KEY", "FISH_REFERENCE_ID"]),
     "sarvam":     (build_sarvam,     ["SARVAM_API_KEY"]),
     "murf":       (build_murf,       ["MURF_API_KEY"]),

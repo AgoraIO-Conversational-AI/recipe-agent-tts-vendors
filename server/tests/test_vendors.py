@@ -43,3 +43,30 @@ def test_byo_vendor_missing_creds_raises():
         assert R.required_env(name)[0] in str(e)
     else:
         raise AssertionError(f"{name} should raise when creds are absent")
+
+
+def test_rime_defaults_to_agora_managed_credentials():
+    assert R.required_env("rime") == []
+    assert R.needs_key("rime") is False
+    assert R.build_vendor("rime", {}).to_config() == {
+        "vendor": "rime",
+        "credential_mode": "managed",
+        "params": {
+            "modelId": "mistv3",
+            "base_url": "wss://users-ws.rime.ai/ws3",
+        },
+    }
+
+
+def test_rime_api_key_switches_to_byok():
+    env = {"RIME_API_KEY": "rime-key"}
+
+    assert R.required_env("rime") == []
+    assert R.build_vendor("rime", env).to_config() == {
+        "vendor": "rime",
+        "params": {
+            "modelId": "mistv2",
+            "api_key": "rime-key",
+            "speaker": "cove",
+        },
+    }

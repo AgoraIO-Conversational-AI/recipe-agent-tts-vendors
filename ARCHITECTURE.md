@@ -55,7 +55,7 @@ EventTimeline + annotated transcript in the web UI
   required SDK field.
 - `available()` / `required_env(name)` expose the registry for tests and docs.
 
-Entries with empty `creds` (`minimax`, `openai`) are 🟢 keyless. The framework
+Entries with empty `creds` (`minimax`, `openai`, `rime`) are 🟢 keyless. The framework
 code is identical across the sibling vendor recipes; only `CATEGORY` and `SPECS`
 differ.
 
