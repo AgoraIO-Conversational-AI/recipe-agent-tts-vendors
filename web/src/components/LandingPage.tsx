@@ -241,6 +241,7 @@ export default function LandingPage() {
 										<ConversationComponent
 											agoraData={agoraData}
 											rtmClient={rtmClient}
+											ttsVendor={selectedVendor}
 											onTokenWillExpire={handleTokenWillExpire}
 											onEndConversation={handleEndConversation}
 										/>

@@ -9,12 +9,13 @@ export type QuickstartAgentMetric = {
 
 type QuickstartPipelineMetricsProps = {
 	metrics: QuickstartAgentMetric[];
+	ttsVendor: string;
 };
 
 const PIPELINE = [
 	{ key: "stt", label: "Deepgram STT", metricTypes: ["stt", "asr"] },
 	{ key: "llm", label: "OpenAI LLM", metricTypes: ["llm", "mllm"] },
-	{ key: "tts", label: "MiniMax TTS", metricTypes: ["tts"] },
+	{ key: "tts", label: "TTS", metricTypes: ["tts"] },
 ] as const;
 
 function formatMetricName(name: string) {
@@ -23,6 +24,7 @@ function formatMetricName(name: string) {
 
 export function QuickstartPipelineMetrics({
 	metrics,
+	ttsVendor,
 }: QuickstartPipelineMetricsProps) {
 	const latestByType = new Map<string, QuickstartAgentMetric>();
 	for (const metric of metrics) {
@@ -50,7 +52,9 @@ export function QuickstartPipelineMetrics({
 							</span>
 						) : null}
 						<span className="rounded-md border border-border bg-transparent px-2 py-0.5 text-xs font-semibold leading-4 text-foreground shadow-sm">
-							{step.label}
+							{step.key === "tts" && ttsVendor
+								? `${ttsVendor} TTS`
+								: step.label}
 							{metric ? (
 								<span
 									className="ml-2 text-primary"
