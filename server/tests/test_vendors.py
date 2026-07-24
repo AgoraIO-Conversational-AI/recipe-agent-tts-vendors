@@ -17,6 +17,8 @@ EXPECTED_VENDOR = {
     "fishaudio": "fishaudio",
     "sarvam": "sarvam",
     "murf": "murf",
+    "gradium": "gradium",
+    "mistral": "mistral",
 }
 
 
@@ -68,5 +70,48 @@ def test_rime_api_key_switches_to_byok():
             "modelId": "mistv2",
             "api_key": "rime-key",
             "speaker": "cove",
+        },
+    }
+
+
+def test_gradium_uses_api_key_only():
+    assert R.build_vendor(
+        "gradium",
+        {"GRADIUM_API_KEY": "gradium-key"},
+    ).to_config() == {
+        "vendor": "gradium",
+        "params": {
+            "api_key": "gradium-key",
+        },
+    }
+
+
+def test_mistral_maps_generic_model_and_voice_overrides():
+    env = {
+        "MISTRAL_API_KEY": "mistral-key",
+        "TTS_MODEL": "mistral-model",
+        "TTS_VOICE": "mistral-voice",
+    }
+
+    assert R.build_vendor("mistral", env).to_config() == {
+        "vendor": "mistral",
+        "params": {
+            "api_key": "mistral-key",
+            "model": "mistral-model",
+            "voice": "mistral-voice",
+        },
+    }
+
+
+def test_mistral_uses_a_runnable_default_model_and_voice():
+    assert R.build_vendor(
+        "mistral",
+        {"MISTRAL_API_KEY": "mistral-key"},
+    ).to_config() == {
+        "vendor": "mistral",
+        "params": {
+            "api_key": "mistral-key",
+            "model": "voxtral-mini-tts-2603",
+            "voice": "en_paul_neutral",
         },
     }

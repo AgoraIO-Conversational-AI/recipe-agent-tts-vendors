@@ -143,6 +143,20 @@ def build_murf(env):
     return V.MurfTTS(key=env["MURF_API_KEY"])
 
 
+def build_gradium(env):
+    """Gradium — require GRADIUM_API_KEY; use provider defaults."""
+    return V.GradiumTTS(api_key=env["GRADIUM_API_KEY"])
+
+
+def build_mistral(env):
+    """Mistral — require MISTRAL_API_KEY; allow TTS_MODEL/TTS_VOICE overrides."""
+    return V.MistralTTS(
+        api_key=env["MISTRAL_API_KEY"],
+        model=_model(env, "voxtral-mini-tts-2603"),
+        voice=_voice(env, "en_paul_neutral"),
+    )
+
+
 # --- registry: name -> (builder, required env vars) -------------------------
 # An empty env list means the vendor is Agora-managed / key-less.
 REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
@@ -159,6 +173,8 @@ REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
     "fishaudio":  (build_fishaudio,  ["FISH_API_KEY", "FISH_REFERENCE_ID"]),
     "sarvam":     (build_sarvam,     ["SARVAM_API_KEY"]),
     "murf":       (build_murf,       ["MURF_API_KEY"]),
+    "gradium":    (build_gradium,    ["GRADIUM_API_KEY"]),
+    "mistral":    (build_mistral,    ["MISTRAL_API_KEY"]),
 }
 
 
