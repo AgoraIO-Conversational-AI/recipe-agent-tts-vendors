@@ -106,11 +106,17 @@ def build_humeai(env):
 
 
 def build_rime(env):
-    """Rime — set RIME_API_KEY (rime.ai)."""
+    """Rime — Agora-managed by default; set RIME_API_KEY for BYOK."""
+    if env.get("RIME_API_KEY"):
+        return V.RimeTTS(
+            key=env["RIME_API_KEY"],
+            speaker="cove",
+            model_id="mistv2",
+        )
     return V.RimeTTS(
-        key=env["RIME_API_KEY"],
-        speaker="cove",
-        model_id="mistv2",
+        credential_mode="managed",
+        base_url="wss://users-ws.rime.ai/ws3",
+        model_id="mistv3",
     )
 
 
@@ -137,6 +143,20 @@ def build_murf(env):
     return V.MurfTTS(key=env["MURF_API_KEY"])
 
 
+def build_gradium(env):
+    """Gradium — require GRADIUM_API_KEY; use provider defaults."""
+    return V.GradiumTTS(api_key=env["GRADIUM_API_KEY"])
+
+
+def build_mistral(env):
+    """Mistral — require MISTRAL_API_KEY; allow TTS_MODEL/TTS_VOICE overrides."""
+    return V.MistralTTS(
+        api_key=env["MISTRAL_API_KEY"],
+        model=_model(env, "voxtral-mini-tts-2603"),
+        voice=_voice(env, "en_paul_neutral"),
+    )
+
+
 # --- registry: name -> (builder, required env vars) -------------------------
 # An empty env list means the vendor is Agora-managed / key-less.
 REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
@@ -149,10 +169,12 @@ REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
     "amazon":     (build_amazon,     ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_REGION"]),
     "microsoft":  (build_microsoft,  ["AZURE_SPEECH_KEY", "AZURE_SPEECH_REGION"]),
     "humeai":     (build_humeai,     ["HUME_API_KEY"]),
-    "rime":       (build_rime,       ["RIME_API_KEY"]),
+    "rime":       (build_rime,       []),  # RIME_API_KEY is optional (BYOK)
     "fishaudio":  (build_fishaudio,  ["FISH_API_KEY", "FISH_REFERENCE_ID"]),
     "sarvam":     (build_sarvam,     ["SARVAM_API_KEY"]),
     "murf":       (build_murf,       ["MURF_API_KEY"]),
+    "gradium":    (build_gradium,    ["GRADIUM_API_KEY"]),
+    "mistral":    (build_mistral,    ["MISTRAL_API_KEY"]),
 }
 
 

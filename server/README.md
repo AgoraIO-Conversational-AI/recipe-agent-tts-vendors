@@ -59,6 +59,7 @@ Optional:
 | `TTS_VENDOR` | `minimax` | Which TTS vendor to build (see the root README Vendors table) |
 | `TTS_VOICE` | per-vendor | Optional voice override for the selected vendor |
 | `TTS_MODEL` | per-vendor | Optional model override for the selected vendor |
+| `RIME_API_KEY` | — | Optional; switches Rime from Agora-managed credentials to BYOK |
 | `AGENT_GREETING` | built-in | Optional opening line override |
 
 Selecting a BYO `TTS_VENDOR` additionally requires that vendor's credential env

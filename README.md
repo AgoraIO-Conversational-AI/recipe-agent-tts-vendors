@@ -34,10 +34,12 @@ Two ways to pick a vendor:
 | Amazon Polly | `amazon` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | voice `Joanna` (engine `neural`) |
 | Microsoft Azure | `microsoft` | `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | voice `en-US-JennyNeural` |
 | Hume AI | `humeai` | `HUME_API_KEY` | voice `ito` |
-| Rime | `rime` | `RIME_API_KEY` | speaker `cove`, model `mistv2` |
+| Rime | `rime` 🟢 | `RIME_API_KEY` (optional) | managed model `mistv3`; BYOK speaker `cove`, model `mistv2` |
 | Fish Audio | `fishaudio` | `FISH_API_KEY`, `FISH_REFERENCE_ID` | backend `speech-1.6` |
 | Sarvam | `sarvam` | `SARVAM_API_KEY` | speaker `meera`, language `en-IN` |
 | Murf | `murf` | `MURF_API_KEY` | SDK default |
+| Gradium | `gradium` | `GRADIUM_API_KEY` | SDK default |
+| Mistral | `mistral` | `MISTRAL_API_KEY` | voice `en_paul_neutral`, model `voxtral-mini-tts-2603` |
 
 🟢 = keyless. The selected vendor's credentials are validated **when the agent
 starts** (not at construction), so `/get_config` always works key-less.
@@ -176,7 +178,7 @@ name → builder + required env. See [ARCHITECTURE.md](./ARCHITECTURE.md).
 ## What You Get
 
 - A **vendor switchboard** for the TTS leg: one readable `build_<vendor>` function
-  per vendor (covering all 13 A4.1 TTS vendors), selected via `TTS_VENDOR` or the
+  per vendor (covering all 15 A4.1 TTS vendors), selected via `TTS_VENDOR` or the
   in-UI dropdown.
 - A **Next.js** web client (:3000) with a live **EventTimeline** (state, metric,
   error, turn events; reverse-chronological, capped at 50) and an **annotated

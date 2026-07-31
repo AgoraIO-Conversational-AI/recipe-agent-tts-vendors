@@ -85,6 +85,7 @@ function isRtmSalStatusPayload(value: unknown): value is RtmSalStatusPayload {
 export default function ConversationComponent({
 	agoraData,
 	rtmClient,
+	ttsVendor,
 	onTokenWillExpire,
 	onEndConversation,
 }: ConversationComponentProps) {
@@ -483,7 +484,12 @@ export default function ConversationComponent({
 					onToggle={() => setIsConnectionDetailsOpen((open) => !open)}
 				/>
 			}
-			pipelineMetrics={<QuickstartPipelineMetrics metrics={agentMetrics} />}
+			pipelineMetrics={
+				<QuickstartPipelineMetrics
+					metrics={agentMetrics}
+					ttsVendor={ttsVendor}
+				/>
+			}
 			transcriptPanel={
 				<QuickstartTranscriptPanel
 					messageList={messageList}
