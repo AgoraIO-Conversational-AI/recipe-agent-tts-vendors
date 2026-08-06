@@ -157,6 +157,15 @@ def build_mistral(env):
     )
 
 
+def build_typecast(env):
+    """Typecast — require API key; use a conversational voice by default."""
+    return V.TypecastTTS(
+        api_key=env["TYPECAST_API_KEY"],
+        voice_id=_voice(env, "tc_6620ee743bc61e2f6b79fdd1"),
+        model=_model(env, "ssfm-v30"),
+    )
+
+
 # --- registry: name -> (builder, required env vars) -------------------------
 # An empty env list means the vendor is Agora-managed / key-less.
 REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
@@ -175,6 +184,7 @@ REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
     "murf":       (build_murf,       ["MURF_API_KEY"]),
     "gradium":    (build_gradium,    ["GRADIUM_API_KEY"]),
     "mistral":    (build_mistral,    ["MISTRAL_API_KEY"]),
+    "typecast":   (build_typecast,   ["TYPECAST_API_KEY"]),
 }
 
 

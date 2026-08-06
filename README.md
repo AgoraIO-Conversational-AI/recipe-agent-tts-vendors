@@ -40,6 +40,7 @@ Two ways to pick a vendor:
 | Murf | `murf` | `MURF_API_KEY` | SDK default |
 | Gradium | `gradium` | `GRADIUM_API_KEY` | SDK default |
 | Mistral | `mistral` | `MISTRAL_API_KEY` | voice `en_paul_neutral`, model `voxtral-mini-tts-2603` |
+| Typecast | `typecast` | `TYPECAST_API_KEY` | voice `tc_6620ee743bc61e2f6b79fdd1`, model `ssfm-v30` |
 
 🟢 = keyless. The selected vendor's credentials are validated **when the agent
 starts** (not at construction), so `/get_config` always works key-less.
@@ -64,6 +65,13 @@ V.ElevenLabsTTS(
     model_id="eleven_turbo_v2_5",
     voice_id="21m00Tcm4TlvDq8ikWAM",
     base_url="https://api.elevenlabs.io",
+)
+
+# Typecast — set TYPECAST_API_KEY; override voice/model with TTS_VOICE/TTS_MODEL:
+V.TypecastTTS(
+    api_key=env["TYPECAST_API_KEY"],
+    voice_id="tc_6620ee743bc61e2f6b79fdd1",
+    model="ssfm-v30",
 )
 ```
 
@@ -178,7 +186,7 @@ name → builder + required env. See [ARCHITECTURE.md](./ARCHITECTURE.md).
 ## What You Get
 
 - A **vendor switchboard** for the TTS leg: one readable `build_<vendor>` function
-  per vendor (covering all 15 A4.1 TTS vendors), selected via `TTS_VENDOR` or the
+  per vendor (covering all 16 A4.1 TTS vendors), selected via `TTS_VENDOR` or the
   in-UI dropdown.
 - A **Next.js** web client (:3000) with a live **EventTimeline** (state, metric,
   error, turn events; reverse-chronological, capped at 50) and an **annotated

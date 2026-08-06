@@ -19,6 +19,7 @@ EXPECTED_VENDOR = {
     "murf": "murf",
     "gradium": "gradium",
     "mistral": "mistral",
+    "typecast": "typecast",
 }
 
 
@@ -113,5 +114,39 @@ def test_mistral_uses_a_runnable_default_model_and_voice():
             "api_key": "mistral-key",
             "model": "voxtral-mini-tts-2603",
             "voice": "en_paul_neutral",
+        },
+    }
+
+
+def test_typecast_maps_credentials_and_generic_overrides():
+    env = {
+        "TYPECAST_API_KEY": "typecast-key",
+        "TTS_MODEL": "typecast-model",
+        "TTS_VOICE": "typecast-override-voice",
+    }
+
+    assert R.build_vendor("typecast", env).to_config() == {
+        "vendor": "typecast",
+        "params": {
+            "api_key": "typecast-key",
+            "voice_id": "typecast-override-voice",
+            "model": "typecast-model",
+        },
+    }
+
+
+def test_typecast_uses_runnable_model_and_voice_defaults():
+    assert R.required_env("typecast") == ["TYPECAST_API_KEY"]
+    assert R.build_vendor(
+        "typecast",
+        {
+            "TYPECAST_API_KEY": "typecast-key",
+        },
+    ).to_config() == {
+        "vendor": "typecast",
+        "params": {
+            "api_key": "typecast-key",
+            "voice_id": "tc_6620ee743bc61e2f6b79fdd1",
+            "model": "ssfm-v30",
         },
     }
