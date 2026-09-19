@@ -166,6 +166,17 @@ def build_typecast(env):
     )
 
 
+def build_smallestai(env):
+    """Smallest.ai — require SMALLEST_API_KEY; default to English synthesis."""
+    options = {
+        "api_key": env["SMALLEST_API_KEY"],
+        "model": _model(env, "lightning_v3.1_pro"),
+        "voice_id": _voice(env, "kaitlyn"),
+        "language": env.get("TTS_LANGUAGE") or "en",
+    }
+    return V.SmallestAITTS(**options)
+
+
 # --- registry: name -> (builder, required env vars) -------------------------
 # An empty env list means the vendor is Agora-managed / key-less.
 REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
@@ -185,6 +196,7 @@ REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
     "gradium":    (build_gradium,    ["GRADIUM_API_KEY"]),
     "mistral":    (build_mistral,    ["MISTRAL_API_KEY"]),
     "typecast":   (build_typecast,   ["TYPECAST_API_KEY"]),
+    "smallestai": (build_smallestai, ["SMALLEST_API_KEY"]),
 }
 
 

@@ -24,7 +24,8 @@ The default `minimax` vendor is Agora-managed (keyless), so the recipe is
 
 `src/vendors.py` is a data-driven switchboard:
 
-- `SPECS` maps each `TTS_VENDOR` value to `VendorSpec(cls, creds, defaults, model_field, voice_field)`.
+- `REGISTRY` maps each `TTS_VENDOR` value to its builder and required credential
+  environment variables.
 - `build_vendor(name, env)` builds the vendor, raising `ValueError` listing any
   missing credential env vars.
 - `required_env(name)` / `available()` expose the registry.
@@ -60,6 +61,7 @@ Optional:
 | `TTS_VENDOR` | `minimax` | Which TTS vendor to build (see the root README Vendors table) |
 | `TTS_VOICE` | per-vendor | Optional voice override for the selected vendor |
 | `TTS_MODEL` | per-vendor | Optional model override for the selected vendor |
+| `TTS_LANGUAGE` | `en` | Optional Smallest AI ISO 639-1 language code |
 | `RIME_API_KEY` | — | Optional; switches Rime from Agora-managed credentials to BYOK |
 | `AGENT_GREETING` | built-in | Optional opening line override |
 

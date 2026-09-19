@@ -4,8 +4,8 @@ Two processes. The browser talks only to Next.js `/api/*`, which rewrites to the
 agent backend. The agent backend owns Agora tokens and agent lifecycle.
 
 The net-new work in this recipe is the **TTS vendor switchboard** in
-`server/src/vendors.py`: a data-driven registry that builds any A4.1 TTS vendor
-from a `SPECS` table. The agent reads `TTS_VENDOR` and swaps only the TTS leg of
+`server/src/vendors.py`: a data-driven registry that builds 17 TTS vendors
+from a `REGISTRY` mapping. The agent reads `TTS_VENDOR` and swaps only the TTS leg of
 the cascade; STT and LLM stay on the proven keyless configs. The default vendor
 (`minimax`) is Agora-managed (keyless), so no separate TTS service is needed.
 
@@ -44,19 +44,15 @@ EventTimeline + annotated transcript in the web UI
 
 `server/src/vendors.py` is a **data-driven switchboard**:
 
-- `SPECS` maps each `TTS_VENDOR` value to a `VendorSpec(cls, creds, defaults,
-  model_field, voice_field)` — the SDK vendor class, its required credential env
-  vars, the SDK-verified default config, and which fields `TTS_MODEL` / `TTS_VOICE`
-  override.
-- `build_vendor(name, env)` fills every required SDK field from `defaults`,
-  applies the optional `TTS_MODEL` / `TTS_VOICE` overrides, then pulls each
-  credential from the environment. A missing credential raises a clear
-  `ValueError` listing the env vars — construction never fails on a missing
-  required SDK field.
+- `REGISTRY` maps each `TTS_VENDOR` value to its builder and required credential
+  environment variables.
+- `build_vendor(name, env)` validates those credentials, then calls the vendor's
+  builder. Each builder applies its defaults and supported `TTS_MODEL` /
+  `TTS_VOICE` overrides; Smallest AI also supports `TTS_LANGUAGE`.
 - `available()` / `required_env(name)` expose the registry for tests and docs.
 
 Entries with empty `creds` (`minimax`, `openai`, `rime`) are 🟢 keyless. The framework
-code is identical across the sibling vendor recipes; only `CATEGORY` and `SPECS`
+code is identical across the sibling vendor recipes; only `CATEGORY` and `REGISTRY`
 differ.
 
 ## Why creds are validated in start(), not __init__

@@ -20,6 +20,7 @@ EXPECTED_VENDOR = {
     "gradium": "gradium",
     "mistral": "mistral",
     "typecast": "typecast",
+    "smallestai": "smallestai",
 }
 
 
@@ -46,6 +47,34 @@ def test_byo_vendor_missing_creds_raises():
         assert R.required_env(name)[0] in str(e)
     else:
         raise AssertionError(f"{name} should raise when creds are absent")
+
+
+def test_smallestai_defaults_to_english_and_supports_common_overrides():
+    default_config = R.build_vendor(
+        "smallestai", {"SMALLEST_API_KEY": "smallest-key"}
+    ).to_config()
+    assert default_config == {
+        "vendor": "smallestai",
+        "params": {
+            "api_key": "smallest-key",
+            "model": "lightning_v3.1_pro",
+            "voice_id": "kaitlyn",
+            "language": "en",
+        },
+    }
+
+    override_config = R.build_vendor(
+        "smallestai",
+        {
+            "SMALLEST_API_KEY": "smallest-key",
+            "TTS_MODEL": "custom-model",
+            "TTS_VOICE": "voice-id",
+            "TTS_LANGUAGE": "hi",
+        },
+    ).to_config()
+    assert override_config["params"]["model"] == "custom-model"
+    assert override_config["params"]["voice_id"] == "voice-id"
+    assert override_config["params"]["language"] == "hi"
 
 
 def test_rime_defaults_to_agora_managed_credentials():
