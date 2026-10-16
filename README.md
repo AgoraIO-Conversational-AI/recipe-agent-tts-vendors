@@ -28,7 +28,7 @@ Two ways to pick a vendor:
 | MiniMax (managed) | `minimax` 🟢 | _none_ | voice `English_captivating_female1`, model `speech_2_6_turbo` |
 | OpenAI (managed) | `openai` 🟢 | _none_ | voice `alloy` |
 | ElevenLabs | `elevenlabs` | `ELEVENLABS_API_KEY` | voice `21m00Tcm4TlvDq8ikWAM`, model `eleven_turbo_v2_5` |
-| Cartesia | `cartesia` | `CARTESIA_API_KEY` | voice `a0e99841-438c-4a64-b679-ae501e7d6091`, model `sonic-2` |
+| Cartesia | `cartesia` | `CARTESIA_API_KEY` | voice `a0e99841-438c-4a64-b679-ae501e7d6091`, model `sonic-3.6` |
 | Deepgram | `deepgram` | `DEEPGRAM_API_KEY` | model `aura-asteria-en` |
 | Google | `google` | `GOOGLE_TTS_API_KEY` | voice `en-US-Neural2-F` |
 | Amazon Polly | `amazon` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | voice `Joanna` (engine `neural`) |

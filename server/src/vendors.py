@@ -56,7 +56,7 @@ def build_cartesia(env):
     return V.CartesiaTTS(
         api_key=env["CARTESIA_API_KEY"],
         voice_id=_voice(env, "a0e99841-438c-4a64-b679-ae501e7d6091"),
-        model_id="sonic-2",
+        model_id="sonic-3.6",
     )
 
 
