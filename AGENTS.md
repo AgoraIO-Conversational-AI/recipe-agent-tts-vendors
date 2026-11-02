@@ -9,7 +9,7 @@ is a per-vendor switchboard (one readable `build_<vendor>` per vendor) selected 
 - **`server/`** — Python FastAPI agent backend (:8000). Owns Agora token
   generation and agent session lifecycle. The TTS leg is built from the
   per-vendor builder registry in `server/src/vendors.py`; default vendor `minimax` is
-  Agora-managed (keyless). SDK: `agora-agents>=2.10.0` (`import agora_agent`).
+  Agora-managed (keyless). SDK: `agora-agents>=2.13.0` (`import agora_agent`).
 - **`web/`** — Next.js 16 / React 19 / TypeScript frontend (:3000): the
   `EventTimeline` and the annotated transcript.
 - Auth: Token007 from `AGORA_APP_ID` + `AGORA_APP_CERTIFICATE`.
@@ -22,7 +22,7 @@ is a per-vendor switchboard (one readable `build_<vendor>` per vendor) selected 
 
 ## Vendor registry
 
-- `server/src/vendors.py` holds `CATEGORY = "TTS"`, the `REGISTRY` (17 TTS
+- `server/src/vendors.py` holds `CATEGORY = "TTS"`, the `REGISTRY` (18 TTS
   vendors), and `build_vendor()` / `required_env()` / `available()`.
 - `agent.py` reads `TTS_VENDOR` in `__init__` (no validation) and calls
   `build_vendor(self.vendor)` for the TTS leg **in `start()`** — BYO credential

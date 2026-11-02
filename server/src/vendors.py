@@ -52,11 +52,17 @@ def build_elevenlabs(env):
 
 
 def build_cartesia(env):
-    """Cartesia — set CARTESIA_API_KEY (cartesia.ai)."""
+    """Cartesia — Agora-managed by default (TTS_MODEL overrides the managed model); set CARTESIA_API_KEY for BYOK."""
+    if env.get("CARTESIA_API_KEY"):
+        return V.CartesiaTTS(
+            api_key=env["CARTESIA_API_KEY"],
+            voice_id=_voice(env, "a0e99841-438c-4a64-b679-ae501e7d6091"),
+            model_id="sonic-2",
+        )
     return V.CartesiaTTS(
-        api_key=env["CARTESIA_API_KEY"],
+        credential_mode="managed",
         voice_id=_voice(env, "a0e99841-438c-4a64-b679-ae501e7d6091"),
-        model_id="sonic-2",
+        model_id=_model(env, "sonic-3.6"),
     )
 
 
@@ -121,20 +127,42 @@ def build_rime(env):
 
 
 def build_fishaudio(env):
-    """Fish Audio — set FISH_API_KEY and FISH_REFERENCE_ID (fish.audio)."""
+    """Fish Audio — Agora-managed by default (TTS_MODEL overrides the managed backend); set FISH_API_KEY + FISH_REFERENCE_ID for BYOK."""
+    if env.get("FISH_API_KEY"):
+        if not env.get("FISH_REFERENCE_ID"):
+            raise ValueError(
+                f"{CATEGORY} vendor 'fishaudio' requires environment variable(s): FISH_REFERENCE_ID"
+            )
+        return V.FishAudioTTS(
+            key=env["FISH_API_KEY"],
+            reference_id=env["FISH_REFERENCE_ID"],
+            backend="speech-1.6",
+        )
+    # Managed mode runs on Agora's Fish Audio account, so use a voice model that is
+    # available there; FISH_REFERENCE_ID overrides it and TTS_MODEL overrides the backend.
     return V.FishAudioTTS(
-        key=env["FISH_API_KEY"],
-        reference_id=env["FISH_REFERENCE_ID"],
-        backend="speech-1.6",
+        credential_mode="managed",
+        reference_id=env.get("FISH_REFERENCE_ID") or "59cb5986671546eaa6ca8ae6f29f6d22",
+        backend=_model(env, "s2.1-pro"),
     )
 
 
 def build_sarvam(env):
-    """Sarvam — set SARVAM_API_KEY (sarvam.ai)."""
+    """Sarvam — set SARVAM_API_KEY (sarvam.ai). Override model/speaker with TTS_MODEL/TTS_VOICE."""
     return V.SarvamTTS(
         key=env["SARVAM_API_KEY"],
-        speaker="meera",
+        model=_model(env, "bulbul:v3"),
+        speaker=_voice(env, "ishita"),
         target_language_code="en-IN",
+    )
+
+
+def build_gemini(env):
+    """Gemini TTS — set GEMINI_API_KEY (production endpoint). Override voice/model with TTS_VOICE/TTS_MODEL."""
+    return V.GeminiTTS(
+        api_key=env["GEMINI_API_KEY"],
+        voice=_voice(env, "Puck"),
+        model=_model(env, V.GeminiTTSModels.FLASH_38),
     )
 
 
@@ -183,20 +211,21 @@ REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
     "minimax":    (build_minimax,    []),
     "openai":     (build_openai,     []),
     "elevenlabs": (build_elevenlabs, ["ELEVENLABS_API_KEY"]),
-    "cartesia":   (build_cartesia,   ["CARTESIA_API_KEY"]),
+    "cartesia":   (build_cartesia,   []),  # CARTESIA_API_KEY is optional (BYOK)
     "deepgram":   (build_deepgram,   ["DEEPGRAM_API_KEY"]),
     "google":     (build_google,     ["GOOGLE_TTS_API_KEY"]),
     "amazon":     (build_amazon,     ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_REGION"]),
     "microsoft":  (build_microsoft,  ["AZURE_SPEECH_KEY", "AZURE_SPEECH_REGION"]),
     "humeai":     (build_humeai,     ["HUME_API_KEY"]),
     "rime":       (build_rime,       []),  # RIME_API_KEY is optional (BYOK)
-    "fishaudio":  (build_fishaudio,  ["FISH_API_KEY", "FISH_REFERENCE_ID"]),
+    "fishaudio":  (build_fishaudio,  []),  # FISH_API_KEY is optional (BYOK; then FISH_REFERENCE_ID is required)
     "sarvam":     (build_sarvam,     ["SARVAM_API_KEY"]),
     "murf":       (build_murf,       ["MURF_API_KEY"]),
     "gradium":    (build_gradium,    ["GRADIUM_API_KEY"]),
     "mistral":    (build_mistral,    ["MISTRAL_API_KEY"]),
     "typecast":   (build_typecast,   ["TYPECAST_API_KEY"]),
     "smallestai": (build_smallestai, ["SMALLEST_API_KEY"]),
+    "gemini":     (build_gemini,     ["GEMINI_API_KEY"]),
 }
 
 
