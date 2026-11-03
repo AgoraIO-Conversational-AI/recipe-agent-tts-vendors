@@ -4,7 +4,7 @@ Two processes. The browser talks only to Next.js `/api/*`, which rewrites to the
 agent backend. The agent backend owns Agora tokens and agent lifecycle.
 
 The net-new work in this recipe is the **TTS vendor switchboard** in
-`server/src/vendors.py`: a data-driven registry that builds 17 TTS vendors
+`server/src/vendors.py`: a data-driven registry that builds 18 TTS vendors
 from a `REGISTRY` mapping. The agent reads `TTS_VENDOR` and swaps only the TTS leg of
 the cascade; STT and LLM stay on the proven keyless configs. The default vendor
 (`minimax`) is Agora-managed (keyless), so no separate TTS service is needed.
@@ -51,9 +51,10 @@ EventTimeline + annotated transcript in the web UI
   `TTS_VOICE` overrides; Smallest AI also supports `TTS_LANGUAGE`.
 - `available()` / `required_env(name)` expose the registry for tests and docs.
 
-Entries with empty `creds` (`minimax`, `openai`, `rime`) are 🟢 keyless. The framework
-code is identical across the sibling vendor recipes; only `CATEGORY` and `REGISTRY`
-differ.
+Entries with empty `creds` (`minimax`, `openai`, `rime`, `cartesia`, `fishaudio`)
+are 🟢 keyless; `rime`, `cartesia`, and `fishaudio` switch to BYOK when their
+vendor key is set. The framework code is identical across the sibling vendor
+recipes; only `CATEGORY` and `REGISTRY` differ.
 
 ## Why creds are validated in start(), not __init__
 
@@ -91,6 +92,7 @@ The browser calls these as `/api/*`; Next rewrites them to `AGENT_BACKEND_URL`.
 - Browser → agent backend: none (local dev).
 - Agent backend → Agora cloud: Token007, generated from `AGORA_APP_ID` +
   `AGORA_APP_CERTIFICATE`.
-- Agora cloud → TTS vendor: on the default `minimax` vendor, an Agora-managed key
+- Agora cloud → TTS vendor: on the keyless vendors (default `minimax`, `openai`,
+  and `rime` / `cartesia` / `fishaudio` without their key), an Agora-managed key
   (transparent to this recipe). For any BYO vendor, the credentials you supply in
   the environment are passed through in the vendor config.

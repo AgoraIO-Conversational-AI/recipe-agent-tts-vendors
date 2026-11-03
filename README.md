@@ -28,20 +28,21 @@ Two ways to pick a vendor:
 | MiniMax (managed) | `minimax` 🟢 | _none_ | voice `English_captivating_female1`, model `speech_2_6_turbo` |
 | OpenAI (managed) | `openai` 🟢 | _none_ | voice `alloy` |
 | ElevenLabs | `elevenlabs` | `ELEVENLABS_API_KEY` | voice `21m00Tcm4TlvDq8ikWAM`, model `eleven_turbo_v2_5` |
-| Cartesia | `cartesia` | `CARTESIA_API_KEY` | voice `a0e99841-438c-4a64-b679-ae501e7d6091`, model `sonic-2` |
+| Cartesia | `cartesia` 🟢 | `CARTESIA_API_KEY` (optional) | voice `a0e99841-438c-4a64-b679-ae501e7d6091`; managed model `sonic-3.6` (override with `TTS_MODEL`); BYOK model `sonic-2` |
 | Deepgram | `deepgram` | `DEEPGRAM_API_KEY` | model `aura-asteria-en` |
 | Google | `google` | `GOOGLE_TTS_API_KEY` | voice `en-US-Neural2-F` |
 | Amazon Polly | `amazon` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | voice `Joanna` (engine `neural`) |
 | Microsoft Azure | `microsoft` | `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | voice `en-US-JennyNeural` |
 | Hume AI | `humeai` | `HUME_API_KEY` | voice `ito` |
 | Rime | `rime` 🟢 | `RIME_API_KEY` (optional) | managed model `mistv3`; BYOK speaker `cove`, model `mistv2` |
-| Fish Audio | `fishaudio` | `FISH_API_KEY`, `FISH_REFERENCE_ID` | backend `speech-1.6` |
-| Sarvam | `sarvam` | `SARVAM_API_KEY` | speaker `meera`, language `en-IN` |
+| Fish Audio | `fishaudio` 🟢 | `FISH_API_KEY` (optional; BYOK also needs `FISH_REFERENCE_ID`) | managed reference `59cb5986671546eaa6ca8ae6f29f6d22` (override with `FISH_REFERENCE_ID`), backend `s2.1-pro` (override with `TTS_MODEL`); BYOK backend `speech-1.6` |
+| Sarvam | `sarvam` | `SARVAM_API_KEY` | speaker `ishita`, model `bulbul:v3`, language `en-IN` |
 | Murf | `murf` | `MURF_API_KEY` | SDK default |
 | Gradium | `gradium` | `GRADIUM_API_KEY` | SDK default |
 | Mistral | `mistral` | `MISTRAL_API_KEY` | voice `en_paul_neutral`, model `voxtral-mini-tts-2603` |
 | Typecast | `typecast` | `TYPECAST_API_KEY` | voice `tc_6620ee743bc61e2f6b79fdd1`, model `ssfm-v30` |
 | Smallest.ai | `smallestai` | `SMALLEST_API_KEY` | voice `kaitlyn`, model `lightning_v3.1_pro`, language `en`; optional overrides |
+| Gemini TTS (production) | `gemini` | `GEMINI_API_KEY` | voice `Puck`, model `gemini-3.8-flash-tts` (the SDK defaults) |
 
 🟢 = keyless. The selected vendor's credentials are validated **when the agent
 starts** (not at construction), so `/get_config` always works key-less.
@@ -73,6 +74,13 @@ V.TypecastTTS(
     api_key=env["TYPECAST_API_KEY"],
     voice_id="tc_6620ee743bc61e2f6b79fdd1",
     model="ssfm-v30",
+)
+
+# Gemini TTS — set GEMINI_API_KEY (production endpoint); override voice/model with TTS_VOICE/TTS_MODEL:
+V.GeminiTTS(
+    api_key=env["GEMINI_API_KEY"],
+    voice="Puck",
+    model=V.GeminiTTSModels.FLASH_38,  # "gemini-3.8-flash-tts"
 )
 ```
 
@@ -192,7 +200,7 @@ name → builder + required env. See [ARCHITECTURE.md](./ARCHITECTURE.md).
 ## What You Get
 
 - A **vendor switchboard** for the TTS leg: one readable `build_<vendor>` function
-  per vendor (covering 17 TTS vendors), selected via `TTS_VENDOR` or the
+  per vendor (covering 18 TTS vendors), selected via `TTS_VENDOR` or the
   in-UI dropdown.
 - A **Next.js** web client (:3000) with a live **EventTimeline** (state, metric,
   error, turn events; reverse-chronological, capped at 50) and an **annotated
