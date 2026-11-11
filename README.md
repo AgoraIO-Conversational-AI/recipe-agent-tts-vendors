@@ -42,6 +42,7 @@ Two ways to pick a vendor:
 | Mistral | `mistral` | `MISTRAL_API_KEY` | voice `en_paul_neutral`, model `voxtral-mini-tts-2603` |
 | Typecast | `typecast` | `TYPECAST_API_KEY` | voice `tc_6620ee743bc61e2f6b79fdd1`, model `ssfm-v30` |
 | Smallest.ai | `smallestai` | `SMALLEST_API_KEY` | voice `kaitlyn`, model `lightning_v3.1_pro`, language `en`; optional overrides |
+| Soniox | `soniox` | `SONIOX_API_KEY` | provider defaults; optional `TTS_MODEL` / `TTS_VOICE` overrides |
 | Gemini TTS (production) | `gemini` | `GEMINI_API_KEY` | voice `Puck`, model `gemini-3.8-flash-tts` (the SDK defaults) |
 
 🟢 = keyless. The selected vendor's credentials are validated **when the agent
@@ -75,6 +76,9 @@ V.TypecastTTS(
     voice_id="tc_6620ee743bc61e2f6b79fdd1",
     model="ssfm-v30",
 )
+
+# Soniox — set SONIOX_API_KEY (agora-agents >= 2.14.0):
+V.SonioxTTS(api_key=env["SONIOX_API_KEY"])
 
 # Gemini TTS — set GEMINI_API_KEY (production endpoint); override voice/model with TTS_VOICE/TTS_MODEL:
 V.GeminiTTS(
@@ -200,7 +204,7 @@ name → builder + required env. See [ARCHITECTURE.md](./ARCHITECTURE.md).
 ## What You Get
 
 - A **vendor switchboard** for the TTS leg: one readable `build_<vendor>` function
-  per vendor (covering 18 TTS vendors), selected via `TTS_VENDOR` or the
+  per vendor (covering 19 TTS vendors), selected via `TTS_VENDOR` or the
   in-UI dropdown.
 - A **Next.js** web client (:3000) with a live **EventTimeline** (state, metric,
   error, turn events; reverse-chronological, capped at 50) and an **annotated
