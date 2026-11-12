@@ -4,7 +4,7 @@ Two processes. The browser talks only to Next.js `/api/*`, which rewrites to the
 agent backend. The agent backend owns Agora tokens and agent lifecycle.
 
 The net-new work in this recipe is the **TTS vendor switchboard** in
-`server/src/vendors.py`: a data-driven registry that builds 18 TTS vendors
+`server/src/vendors.py`: a data-driven registry that builds 19 TTS vendors
 from a `REGISTRY` mapping. The agent reads `TTS_VENDOR` and swaps only the TTS leg of
 the cascade; STT and LLM stay on the proven keyless configs. The default vendor
 (`minimax`) is Agora-managed (keyless), so no separate TTS service is needed.

@@ -23,6 +23,7 @@ EXPECTED_VENDOR = {
     "typecast": "typecast",
     "smallestai": "smallestai",
     "gemini": "gemini",
+    "soniox": "soniox",
 }
 
 
@@ -374,3 +375,42 @@ def test_sarvam_pins_bulbul_v3_and_supports_common_overrides():
     assert override_config["params"]["model"] == "sarvam-model"
     assert override_config["params"]["speaker"] == "sarvam-speaker"
     assert override_config["params"]["target_language_code"] == "en-IN"
+
+
+def test_soniox_requires_key_and_uses_provider_defaults():
+    assert R.required_env("soniox") == ["SONIOX_API_KEY"]
+    assert R.needs_key("soniox") is True
+    assert R.build_vendor("soniox", {"SONIOX_API_KEY": "soniox-key"}).to_config() == {
+        "vendor": "soniox",
+        "params": {"api_key": "soniox-key"},
+    }
+
+
+@pytest.mark.parametrize("env", [{}, {"SONIOX_API_KEY": ""}])
+def test_soniox_missing_key_raises(env):
+    with pytest.raises(ValueError, match="SONIOX_API_KEY"):
+        R.build_vendor("soniox", env)
+
+
+def test_soniox_maps_generic_model_and_voice_overrides():
+    config = R.build_vendor("soniox", {
+        "SONIOX_API_KEY": "soniox-key",
+        "TTS_MODEL": "soniox-model",
+        "TTS_VOICE": "soniox-voice",
+    }).to_config()
+    assert config == {
+        "vendor": "soniox",
+        "params": {
+            "api_key": "soniox-key",
+            "model": "soniox-model",
+            "voice": "soniox-voice",
+        },
+    }
+
+
+def test_soniox_empty_overrides_use_provider_defaults():
+    assert R.build_vendor("soniox", {
+        "SONIOX_API_KEY": "soniox-key", "TTS_MODEL": "", "TTS_VOICE": "",
+    }).to_config() == {
+        "vendor": "soniox", "params": {"api_key": "soniox-key"},
+    }

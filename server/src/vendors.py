@@ -157,6 +157,16 @@ def build_sarvam(env):
     )
 
 
+def build_soniox(env):
+    """Soniox — require SONIOX_API_KEY; leave omitted options to the provider."""
+    options = {"api_key": env["SONIOX_API_KEY"]}
+    if env.get("TTS_MODEL"):
+        options["model"] = env["TTS_MODEL"]
+    if env.get("TTS_VOICE"):
+        options["voice"] = env["TTS_VOICE"]
+    return V.SonioxTTS(**options)
+
+
 def build_gemini(env):
     """Gemini TTS — set GEMINI_API_KEY (production endpoint). Override voice/model with TTS_VOICE/TTS_MODEL."""
     return V.GeminiTTS(
@@ -225,6 +235,7 @@ REGISTRY: Dict[str, Tuple[Callable, List[str]]] = {
     "mistral":    (build_mistral,    ["MISTRAL_API_KEY"]),
     "typecast":   (build_typecast,   ["TYPECAST_API_KEY"]),
     "smallestai": (build_smallestai, ["SMALLEST_API_KEY"]),
+    "soniox":     (build_soniox,     ["SONIOX_API_KEY"]),
     "gemini":     (build_gemini,     ["GEMINI_API_KEY"]),
 }
 

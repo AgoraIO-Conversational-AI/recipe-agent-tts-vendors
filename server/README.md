@@ -29,6 +29,8 @@ The default `minimax` vendor is Agora-managed (keyless), so the recipe is
 - `build_vendor(name, env)` builds the vendor, raising `ValueError` listing any
   missing credential env vars.
 - `required_env(name)` / `available()` expose the registry.
+- `soniox` requires `SONIOX_API_KEY` and `agora-agents>=2.14.0`. Model
+  and voice use provider defaults unless `TTS_MODEL` / `TTS_VOICE` are set.
 - `gemini` uses the production global endpoint and requires
   `GEMINI_API_KEY`. It defaults to voice `Puck` and model
   `gemini-3.8-flash-tts` (the SDK defaults); `TTS_VOICE` / `TTS_MODEL`
@@ -78,6 +80,7 @@ Optional:
 | `TTS_VOICE` | per-vendor | Optional voice override for the selected vendor |
 | `TTS_MODEL` | per-vendor | Optional model override for the selected vendor |
 | `TTS_LANGUAGE` | `en` | Optional Smallest AI ISO 639-1 language code |
+| `SONIOX_API_KEY` | — | Required when `TTS_VENDOR=soniox` |
 | `GEMINI_API_KEY` | — | Required when `TTS_VENDOR=gemini` |
 | `RIME_API_KEY` | — | Optional; switches Rime from Agora-managed credentials to BYOK |
 | `CARTESIA_API_KEY` | — | Optional; switches Cartesia from Agora-managed credentials to BYOK |
